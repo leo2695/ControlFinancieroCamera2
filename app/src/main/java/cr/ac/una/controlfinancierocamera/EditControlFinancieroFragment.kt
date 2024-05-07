@@ -88,8 +88,6 @@ class EditControlFinancieroFragment : Fragment() {
 
             // Actualizar los datos en el API
             val updatedTransaction = Movimiento(uuid, tipoGasto, monto, fecha)
-            // Aquí deberías llamar al método para actualizar los datos en el API
-            // Por ejemplo: movimientoController.actualizarMovimiento(updatedTransaction)
             lifecycleScope.launch {
                 try {
                     movimientoController.updateMovimiento(updatedTransaction)
