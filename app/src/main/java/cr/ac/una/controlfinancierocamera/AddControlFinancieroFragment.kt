@@ -55,20 +55,37 @@ class AddControlFinancieroFragment : Fragment() {
 
         //Guardar transaccion
         guardarButton.setOnClickListener {
-            //Lista Dinamica//
+            // Obtener los datos ingresados por el usuario
             val tipoGasto = tipoGasto.text.toString()
             val monto = monto.text.toString()
             val fecha = fechaEditText.text.toString()
-            // Imprimir los datos en la consola de registro
-            Log.d("AddTransactionFragment", "Tipo de gasto: $tipoGasto, Monto: $monto, Fecha: $fecha")
 
+            // Crear la transacción con los datos ingresados
             val transaccion = Movimiento(null, tipoGasto, monto, fecha)
+
+            // Lanzar una corrutina para insertar la transacción en la base de datos
             lifecycleScope.launch {
-                withContext(Dispatchers.Main) {
+                try {
+                    // Insertar la transacción en la base de datos
                     movimientoController.insertMovimiento(transaccion)
+
+                    // Mostrar una notificación de éxito
+                    Toast.makeText(requireContext(), "Transacción agregada", Toast.LENGTH_SHORT).show()
+
+                    // Obtener el FragmentManager y realizar la transacción para volver al ListControlFinancieroFragment
+                    requireActivity().supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.home_content, ListControlFinancieroFragment())
+                        addToBackStack(null)  // Agrega este fragmento a la pila de retroceso
+                        commit()
+                    }
+                } catch (e: Exception) {
+                    // Mostrar una notificación de error si ocurre algún problema
+                    Toast.makeText(requireContext(), "Error al agregar la transacción", Toast.LENGTH_SHORT).show()
+                    Log.e("AddControlFinanciero", "Error al insertar la transacción", e)
                 }
             }
         }
+
 
 
 

@@ -53,27 +53,35 @@ class MovimientoAdapter (context:Context, movimientos:List<Movimiento>):
             }
         }
         var bottonUpdate = view.findViewById<ImageButton>(R.id.button_update)
-        bottonUpdate.setOnClickListener{
+        bottonUpdate.setOnClickListener {
             val mainActivity = context as MainActivity
             GlobalScope.launch(Dispatchers.Main) {
-                movimiento?.let { it1 -> mainActivity.movimientoController.updateMovimiento(it1)
-                    //Editar
+                movimiento?.let { it1 ->
+                    // Obtener el movimiento específico del API
+                    val movimientoFromAPI = it1._uuid?.let { it2 ->
+                        mainActivity.movimientoController.getMovimiento(
+                            it2
+                        )
+                    }
+
+                    // Crear un nuevo fragmento de edición y pasar el movimiento obtenido
                     val fragmentManager = (context as AppCompatActivity).supportFragmentManager
-                    val editTransactionFragment = EditControlFinancieroFragment().apply {
+                    val editControlFinancieroFragment = EditControlFinancieroFragment().apply {
                         arguments = Bundle().apply {
-                            putParcelable("transaction", movimiento) // Pasar la transacción al fragmento de edición
+                            putParcelable("movimiento", movimientoFromAPI) // Pasar el movimiento al fragmento de edición
                         }
                     }
 
+                    // Reemplazar el fragmento actual con el fragmento de edición en el FragmentManager
                     fragmentManager.beginTransaction()
-                        .replace(R.id.home_content, editTransactionFragment) // Reemplazar el fragmento actual con el fragmento de edición
-                        .addToBackStack(null) // Agregar el fragmento actual a la pila de retroceso
+                        .replace(R.id.home_content, editControlFinancieroFragment)
+                        .addToBackStack(null)
                         .commit()
-                    Log.d("TransactionListAdapter", "Editar transacción en la posición: $position")
                 }
-
             }
         }
+
+
         return view
     }
 }

@@ -1,5 +1,6 @@
 package cr.ac.una.controlfinancierocamera.controller
 
+import android.util.Log
 import cr.ac.una.controlfinancierocamera.entity.Movimiento
 import cr.ac.una.controlfinancierocamera.entity.Movimientos
 import cr.ac.una.controlfinancierocamera.service.MovimientoService
@@ -33,13 +34,13 @@ class MovimientoController {
 
     suspend fun updateMovimiento(movimiento: Movimiento) {
         try {
-            movimiento._uuid?.let { uuid ->
-                movimientoService.apiService.updateItem(uuid, movimiento)
-            }
+             movimientoService.apiService.updateItem(movimiento._uuid ?: "", movimiento)
         } catch (e: Exception) {
-            // Manejar la excepción
+            Log.e("MovimientoController", "Error al actualizar el movimiento", e)
+            throw e // Re-lanzar la excepción para manejarla en el fragmento si es necesario
         }
     }
+
 
     suspend fun getMovimiento(uuid: String): Movimiento {
         return movimientoService.apiService.getItem(uuid)

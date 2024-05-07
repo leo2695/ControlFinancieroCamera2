@@ -10,18 +10,30 @@ import androidx.fragment.app.Fragment
 import java.util.Calendar
 import java.util.Locale
 import android.app.DatePickerDialog
-import cr.ac.una.controlfinancierocamera.entity.Movimiento
+import android.util.Log
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import cr.ac.menufragment.ListControlFinancieroFragment
 import cr.ac.una.controlfinancierocamera.controller.MovimientoController
+import cr.ac.una.controlfinancierocamera.entity.Movimiento
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class EditControlFinancieroFragment : Fragment() {
     private lateinit var tipoGastoEditText: EditText
     private lateinit var montoEditText: EditText
     private lateinit var fechaEditText: EditText
     private lateinit var guardarButton: Button
-    private val movimientoController = MovimientoController()
+    val movimientoController = MovimientoController()
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_edit_control_financiero, container, false)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -31,14 +43,8 @@ class EditControlFinancieroFragment : Fragment() {
         fechaEditText = view.findViewById(R.id.fechaEditText)
         guardarButton = view.findViewById(R.id.guardarButton)
 
-        // Obtener datos del API
-        val uuid = arguments?.getString("uuid")
-        GlobalScope.launch(Dispatchers.Main) {
-            val transaction = movimientoController.getMovimiento(uuid)
-            tipoGastoEditText.setText(transaction.tipo)
-            montoEditText.setText(transaction.monto)
-            fechaEditText.setText(transaction.fecha)
-        }
+        // Aquí obtienes los datos de la transacción seleccionada
+        val transaction = arguments?.getParcelable<Movimiento>("movimiento")
 
         //
         ////FECHA/////
@@ -65,19 +71,48 @@ class EditControlFinancieroFragment : Fragment() {
         }
         //
 
-        guardarButton.setOnClickListener {
-            GlobalScope.launch(Dispatchers.Main) {
-                val transaction = movimientoController.getMovimiento(uuid)
-                transaction.tipo = tipoGastoEditText.text.toString()
-                transaction.monto = montoEditText.text.toString()
-                transaction.fecha = fechaEditText.text.toString()
-
-                movimientoController.updateMovimiento(transaction)
-
-                // Notificar al fragmento anterior (TransactionFragment) que los datos han sido actualizados
-                parentFragmentManager.popBackStack()
-            }
+        // Ahora establece los valores de los EditText con los datos de la transacción seleccionada
+        transaction?.let {
+            tipoGastoEditText.setText(it.tipo)
+            montoEditText.setText(it.monto)
+            fechaEditText.setText(it.fecha)
         }
 
+        guardarButton.setOnClickListener {
+            // Aquí obtienes los nuevos valores ingresados por el usuario
+            val tipoGasto = tipoGastoEditText.text.toString()
+            val monto = montoEditText.text.toString()
+            val fecha = fechaEditText.text.toString()
+            val uuid = transaction?._uuid
+            Log.d("UUID", "UUID del movimiento: $uuid")
+
+            // Actualizar los datos en el API
+            val updatedTransaction = Movimiento(uuid, tipoGasto, monto, fecha)
+            // Aquí deberías llamar al método para actualizar los datos en el API
+            // Por ejemplo: movimientoController.actualizarMovimiento(updatedTransaction)
+            lifecycleScope.launch {
+                try {
+                    movimientoController.updateMovimiento(updatedTransaction)
+                    Log.d("Uptate Info", "Movimiento: $updatedTransaction")
+
+                    // Mostrar una notificación de éxito
+                    Toast.makeText(requireContext(), "Transacción actualizada", Toast.LENGTH_SHORT).show()
+                    // Obtener el FragmentManager y realizar la transacción para volver al ListControlFinancieroFragment
+                    requireActivity().supportFragmentManager.beginTransaction().apply {
+                        replace(R.id.home_content, ListControlFinancieroFragment())
+                        addToBackStack(null)  // Agrega este fragmento a la pila de retroceso
+                        commit()
+                    }
+
+                } catch (e: Exception) {
+                    // Mostrar una notificación de error si ocurre algún problema
+                    Toast.makeText(requireContext(), "Error al actualizar", Toast.LENGTH_SHORT).show()
+                    Log.e("EditControlFinanciero", "Error al actualizar la transacción", e)
+                }
+            }
+
+            // Notifica al fragmento anterior (TransactionFragment) que los datos han sido actualizados
+            parentFragmentManager.popBackStack()
+        }
     }
 }
