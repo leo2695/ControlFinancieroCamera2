@@ -8,7 +8,7 @@
 
     <TextView
         android:id="@+id/monto"
-        android:layout_width="33dp"
+        android:layout_width="85dp"
         android:layout_height="19dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
@@ -18,7 +18,7 @@
 
     <TextView
         android:id="@+id/tipo"
-        android:layout_width="95dp"
+        android:layout_width="55dp"
         android:layout_height="21dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
