@@ -110,7 +110,7 @@ class EditControlFinancieroFragment : Fragment() {
             }
 
             // Notifica al fragmento anterior (TransactionFragment) que los datos han sido actualizados
-            parentFragmentManager.popBackStack()
+            //parentFragmentManager.popBackStack()
         }
     }
 }
