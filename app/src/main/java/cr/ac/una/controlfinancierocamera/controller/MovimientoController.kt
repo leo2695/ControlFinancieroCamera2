@@ -9,7 +9,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class MovimientoController {
-    var movimientoService= MovimientoService()
+    /*var movimientoService= MovimientoService()
 
     suspend fun insertMovimiento(movimiento: Movimiento){
 
@@ -44,5 +44,5 @@ class MovimientoController {
 
     suspend fun getMovimiento(uuid: String): Movimiento {
         return movimientoService.apiService.getItem(uuid)
-    }
+    }*/
 }

@@ -15,7 +15,9 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import cr.ac.menufragment.ListControlFinancieroFragment
 import cr.ac.una.controlfinancierocamera.controller.MovimientoController
+import cr.ac.una.controlfinancierocamera.db.AppDatabase
 import cr.ac.una.controlfinancierocamera.entity.Movimiento
+import cr.ac.una.jsoncrud.dao.MovimientoDAO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -26,6 +28,7 @@ class EditControlFinancieroFragment : Fragment() {
     private lateinit var fechaEditText: EditText
     private lateinit var guardarButton: Button
     val movimientoController = MovimientoController()
+    lateinit var transaction: Movimiento
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,8 +46,10 @@ class EditControlFinancieroFragment : Fragment() {
         fechaEditText = view.findViewById(R.id.fechaEditText)
         guardarButton = view.findViewById(R.id.guardarButton)
 
+        lateinit var movimientoDao: MovimientoDAO
+        movimientoDao = AppDatabase.getInstance(requireContext()).ubicacionDao()
         // Aquí obtienes los datos de la transacción seleccionada
-        val transaction = arguments?.getParcelable<Movimiento>("movimiento")
+        transaction = arguments?.getSerializable("movimiento") as Movimiento
 
         //
         ////FECHA/////
@@ -72,7 +77,7 @@ class EditControlFinancieroFragment : Fragment() {
         //
 
         // Ahora establece los valores de los EditText con los datos de la transacción seleccionada
-        transaction?.let {
+        transaction.let {
             tipoGastoEditText.setText(it.tipo)
             montoEditText.setText(it.monto)
             fechaEditText.setText(it.fecha)
@@ -83,14 +88,15 @@ class EditControlFinancieroFragment : Fragment() {
             val tipoGasto = tipoGastoEditText.text.toString()
             val monto = montoEditText.text.toString()
             val fecha = fechaEditText.text.toString()
-            val uuid = transaction?._uuid
+            val uuid = transaction.id
             Log.d("UUID", "UUID del movimiento: $uuid")
 
             // Actualizar los datos en el API
             val updatedTransaction = Movimiento(uuid, tipoGasto, monto, fecha)
             lifecycleScope.launch {
                 try {
-                    movimientoController.updateMovimiento(updatedTransaction)
+                    //movimientoController.updateMovimiento(updatedTransaction)
+                    movimientoDao.update(updatedTransaction)
                     Log.d("Uptate Info", "Movimiento: $updatedTransaction")
 
                     // Mostrar una notificación de éxito

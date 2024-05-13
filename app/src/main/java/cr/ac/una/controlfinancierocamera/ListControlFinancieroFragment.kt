@@ -1,6 +1,7 @@
 package cr.ac.menufragment
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,9 @@ import cr.ac.una.controlfinancierocamera.EditControlFinancieroFragment
 import cr.ac.una.controlfinancierocamera.MainActivity
 import cr.ac.una.controlfinancierocamera.R
 import cr.ac.una.controlfinancierocamera.controller.MovimientoController
+import cr.ac.una.controlfinancierocamera.db.AppDatabase
+import cr.ac.una.controlfinancierocamera.entity.Movimiento
+import cr.ac.una.jsoncrud.dao.MovimientoDAO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -31,6 +35,12 @@ class ListControlFinancieroFragment : Fragment() {
     private var param1: String? = null
     lateinit var adapter: MovimientoAdapter
     val movimientoController = MovimientoController()
+    //
+
+    private lateinit var movimientoDao: MovimientoDAO
+    companion object {
+        private const val TAG = "ListControlFinancieroFragment" // Definir TAG como una constante en el companion object
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,28 +58,39 @@ class ListControlFinancieroFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_list_control_financiero, container, false)
+    //return inflater.inflate(R.layout.fragment_list_control_financiero, container, false)
+        val view = inflater.inflate(R.layout.fragment_list_control_financiero, container, false)
+        movimientoDao = AppDatabase.getInstance(requireContext()).ubicacionDao()
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val botonNuevo = view.findViewById<Button>(R.id.botonNuevo)
+        val listView = view.findViewById<ListView>(R.id.listaMovimientos)
+
         botonNuevo.setOnClickListener {
             insertEntity()
         }
         lifecycleScope.launch {
-            withContext(Dispatchers.Main) {
-                movimientoController.listMovimientos()
-                val list = view.findViewById<ListView>(R.id.listaMovimientos)
-                adapter = MovimientoAdapter(requireContext(), movimientoController.listMovimientos())
-                list.adapter = adapter
+            try {
+                val ubicaciones = withContext(Dispatchers.Default) {
+                    movimientoDao.getAll() // Obtener los datos de la base de datos
+                }
+                val adapter = MovimientoAdapter(requireContext(), ubicaciones as List<Movimiento>, lifecycleScope)
+                listView.adapter = adapter
+            } catch (e: Exception) {
+                // Manejar errores adecuadamente, como mostrar un mensaje de error al usuario
+                Log.e(TAG, "Error en la base de datos: ${e.message}")
             }
         }
     }
 
     private fun insertEntity() {
-        val transactionFragment = AddControlFinancieroFragment()
-        val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
-        transaction.replace(R.id.home_content, transactionFragment)
+        val fragment = AddControlFinancieroFragment()
+        val fragmentManager = (context as MainActivity).supportFragmentManager
+        val transaction = fragmentManager.beginTransaction()
+        transaction.replace(R.id.home_content, fragment)
+        transaction.addToBackStack(null) // Agrega la transacción a la pila de retroceso
         transaction.commit()
     }
 

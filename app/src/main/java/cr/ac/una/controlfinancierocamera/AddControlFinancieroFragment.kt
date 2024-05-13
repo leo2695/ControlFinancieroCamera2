@@ -26,6 +26,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Locale
+import cr.ac.una.controlfinancierocamera.db.AppDatabase
+import cr.ac.una.jsoncrud.dao.MovimientoDAO
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AddControlFinancieroFragment : Fragment() {
     private lateinit var fechaEditText: EditText
@@ -47,6 +51,9 @@ class AddControlFinancieroFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        lateinit var movimientoDao: MovimientoDAO
+        movimientoDao = AppDatabase.getInstance(requireContext()).ubicacionDao()
+
         fechaEditText = view.findViewById(R.id.fechaEditText)
         guardarButton = view.findViewById(R.id.guardarButton)
         volverButton = view.findViewById(R.id.goBack)
@@ -64,23 +71,30 @@ class AddControlFinancieroFragment : Fragment() {
             val transaccion = Movimiento(null, tipoGasto, monto, fecha)
 
             // Lanzar una corrutina para insertar la transacción en la base de datos
-            lifecycleScope.launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 try {
                     // Insertar la transacción en la base de datos
-                    movimientoController.insertMovimiento(transaccion)
+                    //movimientoController.insertMovimiento(transaccion)
+                    movimientoDao.insert(transaccion)
 
-                    // Mostrar una notificación de éxito
-                    Toast.makeText(requireContext(), "Transacción agregada", Toast.LENGTH_SHORT).show()
+                    // Mostrar una notificación de éxito en el hilo principal
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "Transacción agregada", Toast.LENGTH_SHORT).show()
+                    }
 
                     // Obtener el FragmentManager y realizar la transacción para volver al ListControlFinancieroFragment
-                    requireActivity().supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.home_content, ListControlFinancieroFragment())
-                        addToBackStack(null)  // Agrega este fragmento a la pila de retroceso
-                        commit()
+                    withContext(Dispatchers.Main) {
+                        requireActivity().supportFragmentManager.beginTransaction().apply {
+                            replace(R.id.home_content, ListControlFinancieroFragment())
+                            addToBackStack(null)  // Agrega este fragmento a la pila de retroceso
+                            commit()
+                        }
                     }
                 } catch (e: Exception) {
-                    // Mostrar una notificación de error si ocurre algún problema
-                    Toast.makeText(requireContext(), "Error al agregar la transacción", Toast.LENGTH_SHORT).show()
+                    // Mostrar una notificación de error si ocurre algún problema en el hilo principal
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "Error al agregar la transacción", Toast.LENGTH_SHORT).show()
+                    }
                     Log.e("AddControlFinanciero", "Error al insertar la transacción", e)
                 }
             }
