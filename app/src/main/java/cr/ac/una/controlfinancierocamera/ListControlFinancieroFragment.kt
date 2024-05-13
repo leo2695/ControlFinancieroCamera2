@@ -49,8 +49,6 @@ class ListControlFinancieroFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
 
         }
-
-
     }
 
     override fun onCreateView(
