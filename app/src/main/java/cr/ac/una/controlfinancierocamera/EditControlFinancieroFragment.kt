@@ -93,24 +93,29 @@ class EditControlFinancieroFragment : Fragment() {
 
             // Actualizar los datos en el API
             val updatedTransaction = Movimiento(uuid, tipoGasto, monto, fecha)
-            lifecycleScope.launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 try {
                     //movimientoController.updateMovimiento(updatedTransaction)
                     movimientoDao.update(updatedTransaction)
                     Log.d("Uptate Info", "Movimiento: $updatedTransaction")
 
                     // Mostrar una notificación de éxito
-                    Toast.makeText(requireContext(), "Transacción actualizada", Toast.LENGTH_SHORT).show()
-                    // Obtener el FragmentManager y realizar la transacción para volver al ListControlFinancieroFragment
-                    requireActivity().supportFragmentManager.beginTransaction().apply {
-                        replace(R.id.home_content, ListControlFinancieroFragment())
-                        addToBackStack(null)  // Agrega este fragmento a la pila de retroceso
-                        commit()
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "Transacción actualizada", Toast.LENGTH_SHORT).show()
                     }
-
+                    // Obtener el FragmentManager y realizar la transacción para volver al ListControlFinancieroFragment
+                    withContext(Dispatchers.Main) {
+                        requireActivity().supportFragmentManager.beginTransaction().apply {
+                            replace(R.id.home_content, ListControlFinancieroFragment())
+                            addToBackStack(null)  // Agrega este fragmento a la pila de retroceso
+                            commit()
+                        }
+                    }
                 } catch (e: Exception) {
                     // Mostrar una notificación de error si ocurre algún problema
-                    Toast.makeText(requireContext(), "Error al actualizar", Toast.LENGTH_SHORT).show()
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "Error al actualizar", Toast.LENGTH_SHORT).show()
+                    }
                     Log.e("EditControlFinanciero", "Error al actualizar la transacción", e)
                 }
             }
