@@ -1,35 +1,30 @@
 package cr.ac.una.controlfinancierocamera
 
+import android.app.DatePickerDialog
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
-import android.widget.Toast
-import android.app.DatePickerDialog
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ListView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.lifecycleScope
 import cr.ac.menufragment.ListControlFinancieroFragment
-import cr.ac.una.controlfinanciero.adapter.MovimientoAdapter
-import cr.ac.una.controlfinancierocamera.controller.MovimientoController
+import cr.ac.una.controlfinancierocamera.db.AppDatabase
 import cr.ac.una.controlfinancierocamera.entity.Movimiento
+import cr.ac.una.jsoncrud.dao.MovimientoDAO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Locale
-import cr.ac.una.controlfinancierocamera.db.AppDatabase
-import cr.ac.una.jsoncrud.dao.MovimientoDAO
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class AddControlFinancieroFragment : Fragment() {
     private lateinit var fechaEditText: EditText
@@ -37,8 +32,6 @@ class AddControlFinancieroFragment : Fragment() {
     private lateinit var volverButton: Button
     private lateinit var tipoGasto: TextView
     private lateinit var monto: EditText
-    lateinit var adapter: MovimientoAdapter
-    val movimientoController = MovimientoController()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -74,7 +67,6 @@ class AddControlFinancieroFragment : Fragment() {
             lifecycleScope.launch(Dispatchers.IO) {
                 try {
                     // Insertar la transacción en la base de datos
-                    //movimientoController.insertMovimiento(transaccion)
                     movimientoDao.insert(transaccion)
 
                     // Mostrar una notificación de éxito en el hilo principal
@@ -100,21 +92,13 @@ class AddControlFinancieroFragment : Fragment() {
             }
         }
 
-
-
-
-
-
         val tipo = listOf("Credito", "Debito")
-
         val autoComplete : AutoCompleteTextView = view.findViewById(R.id.auto_complete)
-
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, tipo)
         autoComplete.setAdapter(adapter)
 
         ////FECHA/////
         val fechaEditText = view.findViewById<EditText>(R.id.fechaEditText)
-
         // Set onClickListener to show date picker
         fechaEditText.setOnClickListener {
             val calendar = Calendar.getInstance()

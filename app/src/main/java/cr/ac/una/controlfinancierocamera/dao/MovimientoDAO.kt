@@ -6,8 +6,6 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import cr.ac.una.controlfinancierocamera.entity.Movimiento
-import cr.ac.una.controlfinancierocamera.entity.Movimientos
-import retrofit2.http.*
 
 @Dao
 interface MovimientoDAO {
