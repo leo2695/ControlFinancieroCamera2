@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ListView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import cr.ac.una.controlfinanciero.adapter.MovimientoAdapter
@@ -27,6 +26,7 @@ class ListControlFinancieroFragment : Fragment() {
     private lateinit var movimientoDao: MovimientoDAO
     private lateinit var viewModel: ControlFinancieroViewModel
     private lateinit var adapter: MovimientoAdapter
+    private val movimientosList = mutableListOf<Movimiento>()
     companion object {
         private const val TAG = "ListControlFinancieroFragment" // Definir TAG como una constante en el companion object
     }
@@ -37,6 +37,7 @@ class ListControlFinancieroFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_list_control_financiero, container, false)
         movimientoDao = AppDatabase.getInstance(requireContext()).ubicacionDao()
+        viewModel = ViewModelProvider(this).get(ControlFinancieroViewModel::class.java)
         return view
     }
 
@@ -44,29 +45,34 @@ class ListControlFinancieroFragment : Fragment() {
         val botonNuevo = view.findViewById<Button>(R.id.botonNuevo)
         val listView = view.findViewById<ListView>(R.id.listaMovimientos)
 
-        viewModel = ViewModelProvider(this).get(ControlFinancieroViewModel::class.java)
-        viewModel.textLiveData.observe(viewLifecycleOwner, Observer { newText ->
-            // Aquí puedes hacer algo con el nuevo texto, por ejemplo, mostrarlo en un TextView
-            //textview.text = newText
-        })
-
         botonNuevo.setOnClickListener {
             insertEntity()
         }
+
+        // Observar LiveData para actualizar la lista de movimientos
+        viewModel.movimientosLiveData.observe(viewLifecycleOwner) { movimientos ->
+            adapter.clear()
+            adapter.addAll(movimientos)
+        }
+        // Obtener los movimientos inicialmente
+        obtenerMovimientos()
+
+        adapter = MovimientoAdapter(requireContext(), movimientosList, lifecycleScope)
+        listView.adapter = adapter
+    }
+
+    private fun obtenerMovimientos() {
         lifecycleScope.launch {
             try {
                 val ubicaciones = withContext(Dispatchers.Default) {
-                    movimientoDao.getAll() // Obtener los datos de la base de datos
+                    movimientoDao.getAll()
                 }
-                val adapter = MovimientoAdapter(requireContext(), ubicaciones as List<Movimiento>, lifecycleScope)
-                listView.adapter = adapter
+                viewModel.actualizarMovimientos(ubicaciones)
             } catch (e: Exception) {
-                // Manejar errores adecuadamente, como mostrar un mensaje de error al usuario
                 Log.e(TAG, "Error en la base de datos: ${e.message}")
             }
         }
     }
-
     private fun insertEntity() {
         val fragment = AddControlFinancieroFragment()
         val fragmentManager = (context as MainActivity).supportFragmentManager

@@ -3,12 +3,13 @@ package cr.ac.una.controlfinancierocamera.viewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import cr.ac.una.controlfinancierocamera.entity.Movimiento
 
 class ControlFinancieroViewModel : ViewModel() {
-    private val _textLiveData: MutableLiveData<String> = MutableLiveData()
-    val textLiveData: LiveData<String> = _textLiveData
+    private val _movimientosLiveData = MutableLiveData<List<Movimiento>>()
+    val movimientosLiveData: LiveData<List<Movimiento>> get() = _movimientosLiveData
 
-    fun updateText(newText: String) {
-        _textLiveData.value = newText
+    fun actualizarMovimientos(nuevaLista: List<Movimiento?>?) {
+        _movimientosLiveData.value = nuevaLista as List<Movimiento>?
     }
 }
