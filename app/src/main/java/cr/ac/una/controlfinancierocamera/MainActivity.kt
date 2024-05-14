@@ -11,13 +11,9 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
 import cr.ac.menufragment.CameraFragment
 import cr.ac.menufragment.ListControlFinancieroFragment
-import cr.ac.una.controlfinanciero.adapter.MovimientoAdapter
-import cr.ac.una.controlfinancierocamera.controller.MovimientoController
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-
-    var movimientoController: MovimientoController = MovimientoController()
 
     lateinit var drawerLayout: DrawerLayout
 

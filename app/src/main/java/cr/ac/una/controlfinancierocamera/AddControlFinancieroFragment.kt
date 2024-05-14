@@ -13,13 +13,11 @@ import android.app.DatePickerDialog
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ListView
 import android.widget.TextView
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.lifecycleScope
 import cr.ac.menufragment.ListControlFinancieroFragment
 import cr.ac.una.controlfinanciero.adapter.MovimientoAdapter
-import cr.ac.una.controlfinancierocamera.controller.MovimientoController
 import cr.ac.una.controlfinancierocamera.entity.Movimiento
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,8 +26,6 @@ import java.util.Calendar
 import java.util.Locale
 import cr.ac.una.controlfinancierocamera.db.AppDatabase
 import cr.ac.una.jsoncrud.dao.MovimientoDAO
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class AddControlFinancieroFragment : Fragment() {
     private lateinit var fechaEditText: EditText
@@ -37,8 +33,6 @@ class AddControlFinancieroFragment : Fragment() {
     private lateinit var volverButton: Button
     private lateinit var tipoGasto: TextView
     private lateinit var monto: EditText
-    lateinit var adapter: MovimientoAdapter
-    val movimientoController = MovimientoController()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

@@ -14,7 +14,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import cr.ac.menufragment.ListControlFinancieroFragment
-import cr.ac.una.controlfinancierocamera.controller.MovimientoController
 import cr.ac.una.controlfinancierocamera.db.AppDatabase
 import cr.ac.una.controlfinancierocamera.entity.Movimiento
 import cr.ac.una.jsoncrud.dao.MovimientoDAO
@@ -27,7 +26,6 @@ class EditControlFinancieroFragment : Fragment() {
     private lateinit var montoEditText: EditText
     private lateinit var fechaEditText: EditText
     private lateinit var guardarButton: Button
-    val movimientoController = MovimientoController()
     lateinit var transaction: Movimiento
 
     override fun onCreateView(

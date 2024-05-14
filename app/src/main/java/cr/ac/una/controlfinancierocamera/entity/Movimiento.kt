@@ -3,7 +3,6 @@ package cr.ac.una.controlfinancierocamera.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.io.Serializable
-import java.util.Date
 
 @Entity
 data class Movimiento(
