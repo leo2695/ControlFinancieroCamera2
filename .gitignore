@@ -8,3 +8,8 @@
 .gradle/8.2/fileHashes/fileHashes.bin
 *.bin
 *.lock
+*.lock
+*.bin
+*.lock
+*.lock
+*.probe
