@@ -11,12 +11,11 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
 import cr.ac.menufragment.CameraFragment
 import cr.ac.menufragment.ListControlFinancieroFragment
-import cr.ac.una.controlfinancierocamera.controller.MovimientoController
-
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    var movimientoController: MovimientoController = MovimientoController()
+    //var movimientoController: MovimientoController = MovimientoController()
+
     lateinit var drawerLayout: DrawerLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,9 +37,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
+
         val navigationView = findViewById<NavigationView>(R.id.navigation_view)
         navigationView.setNavigationItemSelectedListener(this)
+
+
     }
+
 
     override fun onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -58,16 +61,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 title = R.string.menu_camera
                 fragment = ListControlFinancieroFragment()
             }
-            R.id.nav_gallery -> {
-                title = R.string.menu_gallery
-                fragment= CameraFragment()
+            /*     R.id.nav_gallery -> {
+                     title = R.string.menu_gallery
+                     fragment= CameraFragment()
 
-            }
-            R.id.nav_manage -> title = R.string.menu_tools
+                 }
+                 R.id.nav_manage -> title = R.string.menu_tools*/
 
             else -> throw IllegalArgumentException("menu option not implemented!!")
         }
-        
+
+
         reemplazarFragmento(fragment, getString(title))
         drawerLayout.closeDrawer(GravityCompat.START)
         return true

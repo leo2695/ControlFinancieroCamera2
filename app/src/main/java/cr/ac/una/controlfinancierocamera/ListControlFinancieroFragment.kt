@@ -1,53 +1,110 @@
 package cr.ac.menufragment
 
+import retrofit2.HttpException
 import android.os.Bundle
+import android.util.Log
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ListView
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
+import android.widget.SearchView
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
-import cr.ac.una.controlfinanciero.adapter.MovimientoAdapter
-import cr.ac.una.controlfinancierocamera.AddControlFinancieroFragment
 import cr.ac.una.controlfinancierocamera.R
-import cr.ac.una.controlfinancierocamera.controller.MovimientoController
+import cr.ac.una.controlfinancierocamera.adapter.BuscadorAdapter
+import cr.ac.una.controlfinancierocamera.controller.PageController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import cr.ac.una.controlfinancierocamera.Articulo
+import cr.ac.una.controlfinancierocamera.DetalleArticuloDialogFragment
+import cr.ac.una.controlfinancierocamera.clases.page
+import android.content.Intent
+import android.net.Uri
 
-class ListControlFinancieroFragment : Fragment() {
-    lateinit var adapter: MovimientoAdapter
-    val movimientoController = MovimientoController()
+
+
+
+class ListControlFinancieroFragment : Fragment(), BuscadorAdapter.OnItemClickListener {
+
+    private lateinit var buscadorAdapter: BuscadorAdapter
+    private val pageController = PageController();
+    private lateinit var botonBuscar: Button
+    private lateinit var buscadorView: SearchView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_list_control_financiero, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val botonNuevo = view.findViewById<Button>(R.id.botonNuevo)
-        botonNuevo.setOnClickListener {
-            insertEntity()
+        //cambio
+        super.onViewCreated(view, savedInstanceState)
+
+        botonBuscar = view.findViewById<Button>(R.id.botonIngresar)
+        buscadorView = view.findViewById(R.id.buscadorView)
+
+        botonBuscar.setOnClickListener {
+            var textoBusqueda = buscadorView.query.toString()
+            textoBusqueda = textoBusqueda.replace(" ", "_")
+            Log.d("TextoBusqueda", textoBusqueda)
+            insertEntity(textoBusqueda)
         }
-        lifecycleScope.launch {
-            withContext(Dispatchers.Main) {
-                movimientoController.listMovimientos()
-                val list = view.findViewById<ListView>(R.id.listaMovimientos)
-                adapter = MovimientoAdapter(requireContext(), movimientoController.listMovimientos())
-                list.adapter = adapter
-            }
-        }
+
+        val listView: ListView = view.findViewById(R.id.listaMovimientos)
+        buscadorAdapter = BuscadorAdapter(requireContext(), mutableListOf(), this)
+        listView.adapter = buscadorAdapter
     }
 
-    private fun insertEntity() {
-        val transactionFragment = AddControlFinancieroFragment()
-        val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
-        transaction.replace(R.id.home_content, transactionFragment)
-        transaction.commit()
+    private fun insertEntity(textoBusqueda: String) {
+        lifecycleScope.launch {
+            try {
+                val resultadoBusqueda = withContext(Dispatchers.IO) {
+                    pageController.Buscar(textoBusqueda)
+                }
+                withContext(Dispatchers.Main) {
+                    Log.d("ResultadoBusqueda", resultadoBusqueda.toString())
+                    buscadorAdapter.clear()
+                    buscadorAdapter.addAll(resultadoBusqueda)
+                }
+            } catch (e: HttpException) {
+                withContext(Dispatchers.Main) {
+                    Log.e("HTTP_ERROR", "Error: ${e.message}")
+                    Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG)
+                        .show()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Log.e("ERROR", "Error: ${e.message}")
+                    Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG)
+                        .show()
+                }
+            }
+        }
+
     }
+
+    /*override fun onItemClick(articulo: Articulo) {
+        // Abrir el DialogFragment para mostrar el detalle del artículo
+        val fragment = DetalleArticuloDialogFragment.newInstance(articulo.titulo, articulo.contenido, articulo.imagenUrl)
+        fragment.show(requireFragmentManager(), "detalle_articulo_dialog")
+    }*/
+    override fun onItemClick(page: page) {
+        val url = "https://es.wikipedia.org/wiki/${page.title}"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        startActivity(intent)
+    }
+
 }
+
+
+
+
+
+
+
+
