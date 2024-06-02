@@ -6,7 +6,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -15,47 +14,43 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
-import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
-import com.google.android.libraries.places.api.net.PlacesClient
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsResponse
+import com.google.android.gms.location.SettingsClient
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import cr.ac.una.controlfinancierocamera.R
-
+import com.google.android.gms.common.api.ApiException
 
 class LocationService : Service() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var notificationManager: NotificationManager
-    private var contNotificacion =3
+    private var contNotificacion = 3
 
     override fun onCreate() {
         super.onCreate()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        Places.initialize(applicationContext, "AIzaSyBLiFVeg7U_Ugu5bMf7EQ_TBEfPE3vOSF4")
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         createNotificationChannel()
-        this.startForeground(3, createNotification("Service running"))
+        startForeground(0, createNotification("Service running"))
 
         requestLocationUpdates()
     }
 
     private fun createNotificationChannel() {
-
         val serviceChannel = NotificationChannel(
             "locationServiceChannel",
             "Location Service Channel",
             NotificationManager.IMPORTANCE_DEFAULT
         )
         notificationManager.createNotificationChannel(serviceChannel)
-
     }
 
     private fun createNotification(message: String): Notification {
@@ -67,81 +62,45 @@ class LocationService : Service() {
     }
 
     private fun requestLocationUpdates() {
-
-
-        val locationRequest = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY, 10000
-        ).apply {
-            setMinUpdateIntervalMillis(5000)
-        }.build()
-
-
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED &&
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            fusedLocationClient.requestLocationUpdates(
-                locationRequest,
-                locationCallback,
-                Looper.getMainLooper()
-            )
+        val locationRequest = LocationRequest.create().apply {
+            interval = 5000
+            fastestInterval = 5000
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
+
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+        val client: SettingsClient = LocationServices.getSettingsClient(this)
+        val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
+
+        task.addOnCompleteListener(object : OnCompleteListener<LocationSettingsResponse> {
+            override fun onComplete(task: Task<LocationSettingsResponse>) {
+                try {
+                    val response = task.getResult(ApiException::class.java)
+                    fusedLocationClient.requestLocationUpdates(
+                        locationRequest,
+                        locationCallback,
+                        Looper.getMainLooper()
+                    )
+                } catch (exception: ApiException) {
+                    Log.e(TAG, "Location settings are not satisfied. Error code: ${exception.statusCode}")
+                }
+            }
+        })
     }
 
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             locationResult.locations.forEach { location ->
-                getPlaceName(location.latitude, location.longitude)
+                // Handle location updates here
             }
         }
-    }
-
-
-    @SuppressLint("MissingPermission")
-    private fun getPlaceName(latitude: Double, longitude: Double) {
-
-        val placeFields: List<Place.Field> = listOf(Place.Field.NAME)
-
-
-        val request: FindCurrentPlaceRequest = FindCurrentPlaceRequest.newInstance(placeFields)
-        val placesClient: PlacesClient = Places.createClient(this)
-
-
-        val placeResponse = placesClient.findCurrentPlace(request)
-        placeResponse.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val response = task.result
-                val topPlaces = response.placeLikelihoods
-                    .sortedByDescending { it.likelihood }
-                    .take(2)
-                topPlaces.forEach { placeLikelihood ->
-                    sendNotification("Lugar: ${placeLikelihood.place.name}, Probabilidad: ${placeLikelihood.likelihood}")
-                    println("Lugar: ${placeLikelihood.place.name}, Probabilidad: ${placeLikelihood.likelihood}")
-                }
-            } else {
-                val exception = task.exception
-                if (exception is ApiException) {
-                    Log.e(TAG, "Lugar no encontrado: ${exception.statusCode}")
-                }
-            }
-        }
-    }
-
-    private fun sendNotification(message: String) {
-        contNotificacion++
-        val notification = NotificationCompat.Builder(this, "locationServiceChannel")
-            .setContentTitle("Lugar encontrado")
-            .setContentText(message).setSmallIcon(R.mipmap.ic_launcher)
-            .build()
-        notificationManager.notify(contNotificacion, notification)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
+    }
+
+    companion object {
+        private const val TAG = "LocationService"
     }
 }
