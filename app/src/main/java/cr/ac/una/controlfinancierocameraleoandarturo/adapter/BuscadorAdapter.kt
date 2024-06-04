@@ -1,6 +1,8 @@
 package cr.ac.una.controlfinancierocameraleoandarturo.adapter
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,8 +12,6 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import cr.ac.una.controlfinancierocameraleoandarturo.R
 import cr.ac.una.controlfinancierocameraleoandarturo.clases.page
-import android.content.Intent
-import android.net.Uri
 
 
 class BuscadorAdapter(context: Context, pages: List<page>, private val listener: OnItemClickListener) :
