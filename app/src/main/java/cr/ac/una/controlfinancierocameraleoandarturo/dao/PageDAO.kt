@@ -1,6 +1,6 @@
-package cr.ac.una.controlfinancierocamera.dao
+package cr.ac.una.controlfinancierocameraleoandarturo.dao
 
-import cr.ac.una.controlfinancierocamera.clases.pages
+import cr.ac.una.controlfinancierocameraleoandarturo.clases.pages
 import retrofit2.http.GET
 import retrofit2.http.Path
 

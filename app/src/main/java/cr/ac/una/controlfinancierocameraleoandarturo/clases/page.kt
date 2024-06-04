@@ -1,4 +1,4 @@
-package cr.ac.una.controlfinancierocamera.clases
+package cr.ac.una.controlfinancierocameraleoandarturo.clases
 
 import java.io.Serializable
 

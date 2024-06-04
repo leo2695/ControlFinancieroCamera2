@@ -1,4 +1,4 @@
-package cr.ac.una.controlfinancierocamera
+package cr.ac.una.controlfinancierocameraleoandarturo
 
 import android.Manifest
 import android.annotation.SuppressLint

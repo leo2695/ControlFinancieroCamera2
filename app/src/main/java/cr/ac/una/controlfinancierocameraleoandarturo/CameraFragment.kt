@@ -15,7 +15,7 @@ import android.widget.Button
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import cr.ac.una.controlfinancierocamera.R
+import cr.ac.una.controlfinancierocameraleoandarturo.R
 
 
 class CameraFragment : Fragment() {

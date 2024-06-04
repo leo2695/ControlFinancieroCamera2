@@ -1,4 +1,4 @@
-package cr.ac.una.controlfinancierocamera
+package cr.ac.una.controlfinancierocameraleoandarturo
 
 import android.Manifest
 import android.content.Intent
@@ -16,7 +16,6 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
-import cr.ac.menufragment.CameraFragment
 import cr.ac.menufragment.ListControlFinancieroFragment
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {

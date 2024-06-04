@@ -1,7 +1,7 @@
-package cr.ac.una.controlfinancierocamera.controller
+package cr.ac.una.controlfinancierocameraleoandarturo.controller
 
-import cr.ac.una.controlfinancierocamera.clases.page
-import cr.ac.una.controlfinancierocamera.service.PagesService
+import cr.ac.una.controlfinancierocameraleoandarturo.clases.page
+import cr.ac.una.controlfinancierocameraleoandarturo.service.PagesService
 
 class PageController {
     var pagesService = PagesService()
