@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Manejar el Intent
         val locationName = intent.getStringExtra("location_name")
         // Para pruebas: usar "Costa Rica" en lugar de la ubicación desde el Intent
-        // val locationName = "Costa Rica"
+        //val locationName = "Costa Rica"
         if (locationName != null) {
             Log.d("MainActivity", "Lugar presionado: $locationName")
             openFragmentWithSearch(locationName)

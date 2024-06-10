@@ -9,12 +9,6 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.bumptech.glide.Glide
 
-/**
- * Un [DialogFragment] que muestra el detalle de un artículo.
- */
-
-
-
 class DetalleArticuloDialogFragment : DialogFragment() {
 
     companion object {

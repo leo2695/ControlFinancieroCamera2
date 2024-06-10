@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.view.LayoutInflater
+import cr.ac.una.controlfinancierocameraleoandarturo.WebViewActivity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
@@ -43,18 +44,15 @@ class BuscadorAdapter(context: Context, pages: List<page>, private val listener:
             Glide.with(context)
                 .load(url)
                 .into(imageView)
-        } ?: imageView.setImageResource(R.drawable.placeholder) // Imagen placeholder
+        } ?: imageView.setImageResource(R.drawable.placeholder)
 
-        /*view.setOnClickListener {
-            val articulo = Articulo(pageItem?.titles?.normalized ?: "Sin título", pageItem?.extract ?: "Sin extracto", pageItem?.thumbnail?.source)
-            // val articulo = convertirPageAArticulo(pageItem)
-            listener.onItemClick(articulo)
-
-        }*/
         view.setOnClickListener {
             val pageItem = getItem(position)
             val url = "https://es.wikipedia.org/wiki/${pageItem?.title}"
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+
+            val intent = Intent(context, WebViewActivity::class.java).apply {
+                putExtra("url", url)
+            }
             context.startActivity(intent)
         }
 

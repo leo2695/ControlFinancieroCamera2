@@ -21,7 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
-
+import cr.ac.una.controlfinancierocameraleoandarturo.WebViewActivity
 class ListControlFinancieroFragment : Fragment(), BuscadorAdapter.OnItemClickListener {
 
     private lateinit var buscadorAdapter: BuscadorAdapter
@@ -53,10 +53,10 @@ class ListControlFinancieroFragment : Fragment(), BuscadorAdapter.OnItemClickLis
         buscadorAdapter = BuscadorAdapter(requireContext(), mutableListOf(), this)
         listView.adapter = buscadorAdapter
 
-        // Check if there's a search query in the arguments and perform the search
-        arguments?.getString("search_query")?.let { searchQuery ->
-            Log.d("ListControlFinancieroFragment", "Realizando búsqueda para: $searchQuery")
-            buscadorView.setQuery(searchQuery, true)
+        // Manejar búsqueda desde los argumentos
+        val searchQuery = arguments?.getString("search_query")
+        if (searchQuery != null) {
+            buscadorView.setQuery(searchQuery, false) // Establecer el texto en la barra de búsqueda
             insertEntity(searchQuery)
         }
     }
@@ -88,7 +88,9 @@ class ListControlFinancieroFragment : Fragment(), BuscadorAdapter.OnItemClickLis
 
     override fun onItemClick(page: page) {
         val url = "https://es.wikipedia.org/wiki/${page.title}"
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        val intent = Intent(requireContext(), WebViewActivity::class.java).apply {
+            putExtra("url", url)
+        }
         startActivity(intent)
     }
 }
