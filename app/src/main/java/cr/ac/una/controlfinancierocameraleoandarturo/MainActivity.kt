@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val title: Int
         lateinit var fragment: Fragment
         when (menuItem.itemId) {
-            R.id.nav_camera -> {
+            R.id.nav_wikipedia -> {
                 title = R.string.menu_camera
                 fragment = ListControlFinancieroFragment()
             }

@@ -15,7 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import cr.ac.una.controlfinancierocameraleoandarturo.R
 import cr.ac.una.controlfinancierocameraleoandarturo.WebViewActivity
 import cr.ac.una.controlfinancierocameraleoandarturo.adapter.BuscadorAdapter
-import cr.ac.una.controlfinancierocameraleoandarturo.clases.page
+import cr.ac.una.controlfinancierocameraleoandarturo.clases.Page
 import cr.ac.una.controlfinancierocameraleoandarturo.controller.PageController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -87,7 +87,7 @@ class ListControlFinancieroFragment : Fragment(), BuscadorAdapter.OnItemClickLis
         }
     }
 
-    override fun onItemClick(page: page) {
+    override fun onItemClick(page: Page) {
         val url = "https://es.wikipedia.org/wiki/${page.title}"
         val intent = Intent(requireContext(), WebViewActivity::class.java).apply {
             putExtra("url", url)
