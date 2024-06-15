@@ -146,7 +146,7 @@ class LocationService : Service() {
                     Log.d("LocationService", "Lugar: $placeName, Probabilidad: ${placeLikelihood.likelihood}")
 
                     // Obtener el título y la descripción de Wikipedia para el lugar
-                    getWikipediaArticle("Lionel Messi")
+                    getWikipediaArticle(placeName)
                 }
             } else {
                 val exception = task.exception
@@ -220,6 +220,7 @@ class LocationService : Service() {
         val intent = Intent(this, WebViewActivity::class.java)
         intent.putExtra("title", title)
         intent.putExtra("description", description)
+
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
 

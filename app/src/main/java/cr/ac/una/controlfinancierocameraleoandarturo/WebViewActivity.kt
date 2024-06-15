@@ -21,21 +21,19 @@ class WebViewActivity : AppCompatActivity() {
         }
         webView.settings.javaScriptEnabled = true
 
+        val title = intent.getStringExtra("title")
         val url = intent.getStringExtra("url")
         Log.d("WebViewActivity", "URL recibida: $url")
+        Log.d("WebViewActivity", "Title recibido: $title")
 
-        if (!url.isNullOrBlank()) {
+        if (title != null && url == null) {
+            supportActionBar?.title = title
+            val title_url = "https://es.wikipedia.org/wiki/${title}"
+            webView.loadUrl(title_url) } else if (url != null) {
             webView.loadUrl(url)
         } else {
-            Log.e("WebViewActivity", "URL es null o está vacía")
-            Toast.makeText(this, "URL inválida. No se puede cargar la página.", Toast.LENGTH_SHORT).show()
+            Log.e("WebViewActivity", "Título o descripción son null")
+            Toast.makeText(this, "Datos incompletos. No se puede cargar la página.", Toast.LENGTH_SHORT).show()
         }
-
-        // Puedes obtener datos adicionales del intent aquí si es necesario
-        val articleName = intent.getStringExtra("articleName")
-        val placeName = intent.getStringExtra("placeName")
-
-        // Ejemplo de cómo podrías usar esos datos (adaptar según tu lógica)
-        supportActionBar?.title = articleName ?: "Artículo de Wikipedia"
     }
 }
