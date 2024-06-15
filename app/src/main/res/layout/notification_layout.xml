@@ -1,0 +1,26 @@
+<!-- notification_layout.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/notification_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:padding="16dp"
+        android:text="Hay resultados relacionados en Wikipedia para este lugar." />
+
+    <Button
+        android:id="@+id/show_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mostrar"
+        android:background="@android:color/holo_blue_dark"
+        android:textColor="@android:color/white"
+        android:padding="16dp"
+        android:gravity="center" />
+
+</LinearLayout>

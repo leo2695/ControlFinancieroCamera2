@@ -30,5 +30,12 @@ class WebViewActivity : AppCompatActivity() {
             Log.e("WebViewActivity", "URL es null o está vacía")
             Toast.makeText(this, "URL inválida. No se puede cargar la página.", Toast.LENGTH_SHORT).show()
         }
+
+        // Puedes obtener datos adicionales del intent aquí si es necesario
+        val articleName = intent.getStringExtra("articleName")
+        val placeName = intent.getStringExtra("placeName")
+
+        // Ejemplo de cómo podrías usar esos datos (adaptar según tu lógica)
+        supportActionBar?.title = articleName ?: "Artículo de Wikipedia"
     }
 }
