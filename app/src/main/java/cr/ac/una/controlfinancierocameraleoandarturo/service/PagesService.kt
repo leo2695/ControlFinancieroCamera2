@@ -1,17 +1,15 @@
 package cr.ac.una.controlfinancierocameraleoandarturo.service
 
-import com.google.gson.GsonBuilder
 import cr.ac.una.controlfinancierocameraleoandarturo.dao.PageDAO
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class PagesService {
 
-    val gson = GsonBuilder().setPrettyPrinting().create()
-
-    val retrofit = Retrofit.Builder()
-        .baseUrl("https://es.wikipedia.org/api/rest_v1/")
+    private val retrofit = Retrofit.Builder()
+        .baseUrl("https://es.wikipedia.org/w/rest.php/v1/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
+
     val apiWikiService = retrofit.create(PageDAO::class.java)
 }

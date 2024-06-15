@@ -4,9 +4,9 @@ import cr.ac.una.controlfinancierocameraleoandarturo.clases.page
 import cr.ac.una.controlfinancierocameraleoandarturo.service.PagesService
 
 class PageController {
-    var pagesService = PagesService()
+    private val pagesService = PagesService()
 
-    suspend fun  Buscar(terminoBusqueda: String):ArrayList<page>{
-        return pagesService.apiWikiService.Buscar(terminoBusqueda).pages as ArrayList<page>
+    suspend fun Buscar(terminoBusqueda: String, limit: Int): List<page> {
+        return pagesService.apiWikiService.Buscar(terminoBusqueda, limit).pages ?: emptyList()
     }
 }

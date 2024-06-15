@@ -1,7 +1,6 @@
 package cr.ac.menufragment
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,6 +13,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import cr.ac.una.controlfinancierocameraleoandarturo.R
+import cr.ac.una.controlfinancierocameraleoandarturo.WebViewActivity
 import cr.ac.una.controlfinancierocameraleoandarturo.adapter.BuscadorAdapter
 import cr.ac.una.controlfinancierocameraleoandarturo.clases.page
 import cr.ac.una.controlfinancierocameraleoandarturo.controller.PageController
@@ -21,7 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
-import cr.ac.una.controlfinancierocameraleoandarturo.WebViewActivity
+
 class ListControlFinancieroFragment : Fragment(), BuscadorAdapter.OnItemClickListener {
 
     private lateinit var buscadorAdapter: BuscadorAdapter
@@ -64,8 +64,9 @@ class ListControlFinancieroFragment : Fragment(), BuscadorAdapter.OnItemClickLis
     private fun insertEntity(textoBusqueda: String) {
         lifecycleScope.launch {
             try {
+                val limit = 10 // Cantidad de resultados que deseas obtener
                 val resultadoBusqueda = withContext(Dispatchers.IO) {
-                    pageController.Buscar(textoBusqueda)
+                    pageController.Buscar(textoBusqueda, limit)
                 }
                 withContext(Dispatchers.Main) {
                     Log.d("ResultadoBusqueda", resultadoBusqueda.toString())
@@ -94,3 +95,4 @@ class ListControlFinancieroFragment : Fragment(), BuscadorAdapter.OnItemClickLis
         startActivity(intent)
     }
 }
+
