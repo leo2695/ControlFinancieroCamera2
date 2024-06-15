@@ -133,27 +133,40 @@ class LocationService : Service() {
         val request: FindCurrentPlaceRequest = FindCurrentPlaceRequest.newInstance(placeFields)
         val placesClient: PlacesClient = Places.createClient(this)
 
-        val placeResponse = placesClient.findCurrentPlace(request)
-        placeResponse.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val response = task.result
-                val topPlaces = response.placeLikelihoods
-                    .sortedByDescending { it.likelihood }
-                    .take(1) // Tomamos solo el primer lugar más probable
+        // Verificar permisos antes de hacer la solicitud a Places API
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            val placeResponse = placesClient.findCurrentPlace(request)
+            placeResponse.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val response = task.result
+                    val topPlaces = response?.placeLikelihoods
+                        ?.sortedByDescending { it.likelihood }
+                        ?.take(1)
 
-                topPlaces.forEach { placeLikelihood ->
-                    val placeName = placeLikelihood.place.name
-                    Log.d("LocationService", "Lugar: $placeName, Probabilidad: ${placeLikelihood.likelihood}")
+                    topPlaces?.forEach { placeLikelihood ->
+                        val placeName = placeLikelihood.place.name
+                        Log.d("LocationService", "Lugar: $placeName, Probabilidad: ${placeLikelihood.likelihood}")
 
-                    // Obtener el título y la descripción de Wikipedia para el lugar
-                    getWikipediaArticle(placeName)
-                }
-            } else {
-                val exception = task.exception
-                if (exception is ApiException) {
-                    Log.e("LocationService", "Lugar no encontrado: ${exception.statusCode}")
+                        // Obtener el título y la descripción de Wikipedia para el lugar
+                        getWikipediaArticle(placeName)
+                    }
+                } else {
+                    val exception = task.exception
+                    if (exception is ApiException) {
+                        Log.e("LocationService", "Lugar no encontrado: ${exception.statusCode}")
+                    }
                 }
             }
+        } else {
+            Log.e("LocationService", "Permisos de ubicación no otorgados")
         }
     }
 

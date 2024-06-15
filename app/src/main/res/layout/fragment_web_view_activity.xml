@@ -20,7 +20,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorAccent"
             app:titleTextColor="@android:color/white"
-            app:navigationIcon="@drawable/car_ui_toolbar_menu_item_icon_ripple"
+            app:navigationIcon="@drawable/car_ui_icon_settings"
             app:contentInsetStart="0dp"
             app:contentInsetLeft="0dp"
             app:contentInsetStartWithNavigation="0dp" />
