@@ -4,15 +4,15 @@ plugins {
 }
 
 android {
-    namespace = "cr.ac.una.controlfinancierocameraleoandarturo"
+    namespace = "cr.ac.una.wikiAPIwithLocation"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "cr.ac.una.controlfinancierocameraleoandarturo"
+        applicationId = "cr.ac.una.wikiAPIwithLocation"
         minSdk = 28
         targetSdk = 34
         versionCode = 1
-        versionName = "1.1"
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

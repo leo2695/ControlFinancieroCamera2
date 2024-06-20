@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".DetalleArticuloDialogFragment">
+    tools:context="cr.ac.una.wikiAPIwithLocation.DetalleArticuloDialogFragment">
     <!-- Título del artículo -->
 
     <ScrollView

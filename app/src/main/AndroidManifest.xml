@@ -19,16 +19,16 @@
         android:theme="@style/Theme.ControlFinancieroCamera"
         tools:targetApi="31">
         <activity
-            android:name=".WebViewActivity"
+            android:name="cr.ac.una.wikiAPIwithLocation.WebViewActivity"
             android:exported="false" />
         <service
-            android:name=".LocationService"
+            android:name="cr.ac.una.wikiAPIwithLocation.LocationService"
             android:foregroundServiceType="location"
             android:enabled="true"
             android:exported="true"/>
 
         <activity
-            android:name=".MainActivity"
+            android:name="cr.ac.una.wikiAPIwithLocation.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
