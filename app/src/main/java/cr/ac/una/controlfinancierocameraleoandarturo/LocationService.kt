@@ -16,16 +16,20 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
+import com.google.android.gms.location.*
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
+import cr.ac.una.controlfinancierocameraleoandarturo.db.AppDatabase
+import cr.ac.una.controlfinancierocameraleoandarturo.dao.LugarDAO
+import cr.ac.una.controlfinancierocameraleoandarturo.entity.Lugar
+import cr.ac.una.controlfinancierocameraleoandarturo.service.PagesService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.*
 
 class LocationService : Service() {
 
@@ -36,19 +40,21 @@ class LocationService : Service() {
     private var lastLatitude: Double? = null
     private var lastLongitude: Double? = null
 
+    private lateinit var lugarDao: LugarDAO
+    private val pageService = PagesService()
+
     override fun onCreate() {
         super.onCreate()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        Places.initialize(applicationContext, "AIzaSyBLiFVeg7U_Ugu5bMf7EQ_TBEfPE3vOSF4")
+        Places.initialize(applicationContext, "YOUR_GOOGLE_API_KEY")
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        lugarDao = AppDatabase.getInstance(applicationContext).lugarDao()
 
         createNotificationChannel()
         this.startForeground(1, createNotification("Service running"))
 
         requestLocationUpdates()
-
-        // Call the test notification method with different location names
-        sendTestNotification("Alajuela")
     }
 
     private fun createNotificationChannel() {
@@ -98,7 +104,6 @@ class LocationService : Service() {
                 val latitude = location.latitude
                 val longitude = location.longitude
 
-                // Check if the location has changed significantly
                 if (hasLocationChanged(latitude, longitude)) {
                     lastLatitude = latitude
                     lastLongitude = longitude
@@ -109,7 +114,7 @@ class LocationService : Service() {
     }
 
     private fun hasLocationChanged(newLatitude: Double, newLongitude: Double): Boolean {
-        val threshold = 0.001 // Change this value to adjust sensitivity
+        val threshold = 0.001
         if (lastLatitude == null || lastLongitude == null) {
             return true
         }
@@ -130,13 +135,20 @@ class LocationService : Service() {
                 val response = task.result
                 val topPlaces = response.placeLikelihoods
                     .sortedByDescending { it.likelihood }
-                    .take(2)
+                    .take(1)
 
                 topPlaces.forEach { placeLikelihood ->
                     val placeName = placeLikelihood.place.name
-                    val message = "Lugar: $placeName, Probabilidad: ${placeLikelihood.likelihood}"
-                    sendNotification(message, placeName)
-                    Log.d("LocationService", message)
+                    if (placeName != null) {
+                        val message = "Lugar: $placeName, Probabilidad: ${placeLikelihood.likelihood}"
+                        sendNotification(message, placeName)
+                        Log.d("LocationService", message)
+
+                        GlobalScope.launch {
+                            val wikipediaTitle = buscarEnWikipedia(placeName)
+                            registrarLugar(latitude, longitude, wikipediaTitle, placeName)
+                        }
+                    }
                 }
             } else {
                 val exception = task.exception
@@ -144,6 +156,33 @@ class LocationService : Service() {
                     Log.e("LocationService", "Lugar no encontrado: ${exception.statusCode}")
                 }
             }
+        }
+    }
+
+    private suspend fun buscarEnWikipedia(placeName: String): String {
+        return try {
+            val pages = pageService.apiWikiService.Buscar(placeName).pages
+            pages?.firstOrNull()?.title ?: "No encontrado"
+        } catch (e: Exception) {
+            Log.e("LocationService", "Error al buscar en Wikipedia: ${e.message}")
+            "No encontrado"
+        }
+    }
+
+    private suspend fun registrarLugar(latitude: Double, longitude: Double, wikipediaTitle: String, placeName: String) {
+        val coordenadas = "$latitude, $longitude"
+        val fechaHora = Date()
+
+        val lugar = Lugar(
+            coordenadas = coordenadas,
+            fechaHora = fechaHora,
+            nombreArticuloWikipedia = wikipediaTitle,
+            nombreLugar = placeName
+        )
+
+        withContext(Dispatchers.IO) {
+            lugarDao.insertLugar(lugar)
+            Log.d("LocationService", "Lugar registrado: $lugar")
         }
     }
 
@@ -169,11 +208,6 @@ class LocationService : Service() {
             .build()
 
         notificationManager.notify(notificationId, notification)
-    }
-
-    private fun sendTestNotification(locationName: String) {
-        val message = "Lugar: $locationName, Probabilidad: 1.0"
-        sendNotification(message, locationName)
     }
 
     override fun onBind(intent: Intent?): IBinder? {

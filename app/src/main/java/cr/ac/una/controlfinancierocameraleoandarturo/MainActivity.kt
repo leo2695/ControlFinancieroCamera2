@@ -17,6 +17,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
 import cr.ac.menufragment.ListControlFinancieroFragment
+import cr.ac.menufragment.ListaLugaresFragment
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -25,6 +26,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     lateinit var drawerLayout: DrawerLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -57,8 +59,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         // Manejar el Intent
         val locationName = intent.getStringExtra("location_name")
-        // Para pruebas: usar "Costa Rica" en lugar de la ubicación desde el Intent
-        //val locationName = "Costa Rica"
         if (locationName != null) {
             Log.d("MainActivity", "Lugar presionado: $locationName")
             openFragmentWithSearch(locationName)
@@ -85,6 +85,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.home_content, fragment)
+            .addToBackStack(null)  // Agrega esta línea
             .commit()
     }
 
@@ -92,7 +93,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
         } else {
-            super.onBackPressed()
+            if (supportFragmentManager.backStackEntryCount > 0) {
+                supportFragmentManager.popBackStack()
+            } else {
+                super.onBackPressed()
+            }
         }
     }
 
@@ -105,7 +110,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fragment = ListControlFinancieroFragment()
             }
 
-            else -> throw IllegalArgumentException("menu option not implemented!!")
+            else -> {
+                title = R.string.menu_gallery
+                fragment = ListaLugaresFragment()
+            }
         }
 
         reemplazarFragmento(fragment, getString(title))
@@ -117,6 +125,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.home_content, fragment)
+            .addToBackStack(null)  // Agrega esta línea
             .commit()
         setTitle(title)
     }
