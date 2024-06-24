@@ -109,17 +109,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 title = R.string.menu_camera
                 fragment = ListControlFinancieroFragment()
             }
-
-            else -> {
+            R.id.nav_gallery -> {
                 title = R.string.menu_gallery
                 fragment = ListaLugaresFragment()
             }
+            R.id.nav_manage -> {
+                title = R.string.menu_tools
+                fragment = FrecuenteFragment()
+            }
+            else -> throw IllegalArgumentException("Unknown menu item selected")
         }
 
         reemplazarFragmento(fragment, getString(title))
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
+
 
     fun reemplazarFragmento(fragment: Fragment, title: String) {
         supportFragmentManager
