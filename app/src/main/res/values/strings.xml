@@ -5,10 +5,13 @@
     <string name="menu_camera">¿Que deseas buscar?</string>
     <string name="menu_gallery">Listar</string>
     <string name="menu_tools">Frecuente</string>
+    <string name="menu_tools2">Top Mas Visitados</string>
     <string name="menu_share">Compartir</string>
     <string name="menu_send">Enviar</string>
     <string name="menu_group">Groupo</string>
     <string name="copyright">© Móviles</string>
+    <string name="menu_clear_db">Clear Database</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment genérico</string>
+    <string name="hello_blank_fragment2">Este Fragment está por ser implementado</string>
 </resources>

@@ -15,9 +15,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.navigation.NavigationView
 import cr.ac.menufragment.ListControlFinancieroFragment
 import cr.ac.menufragment.ListaLugaresFragment
+import cr.ac.una.controlfinancierocameraleoandarturo.db.AppDatabase
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -49,10 +52,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val navigationView = findViewById<NavigationView>(R.id.navigation_view)
         navigationView.setNavigationItemSelectedListener(this)
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.FOREGROUND_SERVICE), LOCATION_PERMISSION_REQUEST_CODE)
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.FOREGROUND_SERVICE
+                ), LOCATION_PERMISSION_REQUEST_CODE
+            )
         } else {
             startLocationService()
         }
@@ -65,7 +76,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -109,14 +124,27 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 title = R.string.menu_camera
                 fragment = ListControlFinancieroFragment()
             }
+
             R.id.nav_gallery -> {
                 title = R.string.menu_gallery
                 fragment = ListaLugaresFragment()
             }
+
             R.id.nav_manage -> {
                 title = R.string.menu_tools
                 fragment = FrecuenteFragment()
             }
+
+            R.id.nav_manage2 -> {
+                title = R.string.menu_tools2
+                fragment = TopFragment()
+            }
+
+            R.id.nav_clear_db -> {
+                clearDatabase()
+                return true
+            }
+
             else -> throw IllegalArgumentException("Unknown menu item selected")
         }
 
@@ -138,5 +166,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun startLocationService() {
         val serviceIntent = Intent(this, LocationService::class.java)
         ContextCompat.startForegroundService(this, serviceIntent)
+    }
+
+    private fun clearDatabase() {
+        lifecycleScope.launch {
+            AppDatabase.clearDatabase(applicationContext)
+            Toast.makeText(this@MainActivity, "Database cleared", Toast.LENGTH_SHORT).show()
+        }
     }
 }

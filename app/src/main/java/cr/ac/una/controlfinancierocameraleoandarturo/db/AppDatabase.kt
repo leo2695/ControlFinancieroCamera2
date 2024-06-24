@@ -11,6 +11,8 @@ import cr.ac.una.controlfinancierocameraleoandarturo.entity.Movimiento
 import cr.ac.una.controlfinancierocameraleoandarturo.entity.Lugar
 import cr.ac.una.controlfinancierocameraleoandarturo.dao.LugarDAO
 import cr.ac.una.controlfinancierocameraleoandarturo.dao.MovimientoDAO
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Database(entities = [Lugar::class], version = 1)
 @TypeConverters(Converters::class)
@@ -38,6 +40,11 @@ abstract class AppDatabase : RoomDatabase() {
                 // Log the exception with a custom message
                 Log.e("AppDatabase", "Error al construir la base de datos", ex)
                 throw ex  // Re-lanzamos la excepción para manejarla en un nivel superior si es necesario
+            }
+        }
+        suspend fun clearDatabase(context: Context) {
+            withContext(Dispatchers.IO) {
+                getInstance(context).clearAllTables()
             }
         }
     }

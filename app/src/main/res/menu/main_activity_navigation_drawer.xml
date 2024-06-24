@@ -16,8 +16,19 @@
             android:id="@+id/nav_manage"
             android:icon="@android:drawable/ic_menu_manage"
             android:title="@string/menu_tools" />
+        <item
+            android:id="@+id/nav_manage2"
+            android:icon="@android:drawable/ic_menu_manage"
+            android:title="@string/menu_tools2" />
     </group>
-
+    <group
+        android:id="@+id/group1"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_clear_db"
+            android:icon="@android:drawable/ic_menu_delete"
+            android:title="@string/menu_clear_db" />
+    </group>
     <group
         android:id="@+id/group1"
         android:checkableBehavior="single"></group>
